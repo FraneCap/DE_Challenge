@@ -17,7 +17,7 @@ def etl_to_warehouse():
     database = "postgres"
 
 
-    # SQLAlchemy engine for Pandas
+
     connection_string = f"postgresql://{user}:{password}@{host}:{port}/{database}"
     engine = create_engine(connection_string)
 
@@ -28,7 +28,7 @@ def etl_to_warehouse():
     with engine.connect() as conn:
         conn.execute("CREATE SCHEMA IF NOT EXISTS warehouse;")
 
-    # Define tables
+    # Definition of fact and dimention tables
     dim_patients = Table('DimPatients', metadata,
         Column('PatientCode', String, primary_key=True),
         Column('PatientName', String),
@@ -69,8 +69,8 @@ def etl_to_warehouse():
     df_patients.to_sql('DimPatients', con=engine, schema='warehouse', if_exists='append', index=False)
     logging.info("DimPatients ETL process completed.")
 
-    # ETL Process for DimDate
-    logging.info("Starting ETL process for DimDate.")
+    # Process for DimDate
+    logging.info("Starting process for DimDate.")
     start_date = datetime(2020, 1, 1)
     end_date = datetime(2024, 12, 31)
     df_dates = pd.DataFrame({'Date': pd.date_range(start_date, end_date)})
@@ -82,9 +82,9 @@ def etl_to_warehouse():
     with engine.connect() as conn:
         conn.execute("TRUNCATE TABLE warehouse.\"DimDate\" CASCADE;")
     df_dates.to_sql('DimDate', con=engine, schema='warehouse', if_exists='append', index=False)
-    logging.info("DimDate ETL process completed.")
+    logging.info("DimDate process completed.")
 
-    # Detailed SQL queries and data merge for FactHospitalStays
+  
     # Stay costs
     logging.info("Starting ETL process for FactsTable.")
     query_stay_costs = """
